@@ -1,12 +1,13 @@
 const express = require('express');
 const authController = require('../controllers/authController');
-const { authBodyValidator } = require('../midddlewares/bodyValidation');
+const validateBody = require('../midddlewares/bodyValidation');
+const { loginSchema, signUpSchema } = require('../helpers/validationSchema');
 
 const router = express.Router();
 
-router.post('/login', authController.login);
+router.post('/login', validateBody(loginSchema), authController.login);
 
-router.post('/register', authBodyValidator, authController.register);
+router.post('/register', validateBody(signUpSchema), authController.register);
 
 router.post('/refresh-token', authController.refreshToken);
 

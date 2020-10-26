@@ -11,19 +11,41 @@ exports.register = async (req, res, next) => {
 		}
 		const user = await User.create(req.body);
 
-		const token = await signToken({ id: user._id });
+		const accessToken = await signToken({ id: user._id });
 
 		return res.status(200).json({
-			data  : user,
-			token
+			data        : user,
+			accessToken
 		});
 	} catch (err) {
+		if (err.isJoi) {
+			err.status = 422;
+		}
 		next(err);
 	}
 };
 
-exports.login = (req, res, next) => {
-	res.send('login route');
+exports.login = async (req, res, next) => {
+	try {
+		const { email, password } = req.body;
+
+		const user = await User.findOne({ email });
+
+		if (!user || !await user.validatePassword(password)) {
+			return next(createError.Unauthorized('Incorrect Credentials'));
+		}
+
+		const accessToken = await signToken({ id: user._id });
+
+		return res.status(200).json({
+			accessToken
+		});
+	} catch (error) {
+		if (error.isJoi) {
+			error.status = 400;
+		}
+		next(error);
+	}
 };
 
 exports.refreshToken = (req, res, next) => {

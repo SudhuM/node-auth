@@ -1,3 +1,4 @@
+const createError = require('http-errors');
 const jwt = require('jsonwebtoken');
 
 exports.signToken = (payload) => {
@@ -10,7 +11,8 @@ exports.signToken = (payload) => {
 			},
 			(err, token) => {
 				if (err) {
-					return reject(err);
+					console.log(err);
+					return reject(new createError.InternalServerError());
 				}
 				return resolve(token);
 			}

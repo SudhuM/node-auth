@@ -56,6 +56,14 @@ userSchema.post('save', function(err, doc, next) {
 	next(err);
 });
 
+// Instance method
+
+userSchema.methods.validatePassword = function(enteredPassword) {
+	const { password } = this;
+
+	return bcrypt.compare(enteredPassword, password);
+};
+
 const User = mongoose.model('user', userSchema);
 
 module.exports = User;
