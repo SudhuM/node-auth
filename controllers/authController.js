@@ -1,6 +1,4 @@
-exports.register = (req, res, next) => {
-	res.send('regsiter router');
-};
+exports.register = async (req, res, next) => {};
 
 exports.login = (req, res, next) => {
 	res.send('login route');
