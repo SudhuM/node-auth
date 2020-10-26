@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const createError = require('http-errors');
+const { signToken } = require('../helpers/jwtHelper');
 
 exports.register = async (req, res, next) => {
 	try {
@@ -8,11 +9,13 @@ exports.register = async (req, res, next) => {
 		if (userExist) {
 			return next(createError.Conflict('User with that email already exists'));
 		}
-
 		const user = await User.create(req.body);
 
+		const token = await signToken({ id: user._id });
+
 		return res.status(200).json({
-			data : user
+			data  : user,
+			token
 		});
 	} catch (err) {
 		next(err);
