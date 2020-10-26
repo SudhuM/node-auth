@@ -3,7 +3,7 @@ const app = require('./app');
 // dotenv
 require('dotenv').config();
 
-const initMongo = require('./helpers/_init_mongo');
+const initMongo = require('./helpers/initMongo');
 
 const PORT = process.env.PORT || 8000;
 

@@ -1,8 +1,8 @@
 const express = require('express');
 const morgan = require('morgan');
-const createError = require('http-errors');
 const helmet = require('helmet');
 const authRoutes = require('./routes/auth');
+const { errorHandler, notFoundHandler } = require('./midddlewares/errorHandler');
 
 const app = express();
 
@@ -14,14 +14,10 @@ app.use(express.json());
 
 app.use('/auth', authRoutes);
 
+// 404 handler
+app.use(notFoundHandler);
+
 // global error handler
-app.use((err, req, res, next) => {
-	return res.status(err.status || 500).json({
-		error : {
-			status : err.status || 500,
-			error  : err.message
-		}
-	});
-});
+app.use(errorHandler);
 
 module.exports = app;
