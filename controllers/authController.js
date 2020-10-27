@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const createError = require('http-errors');
 const { signToken, signRefreshToken } = require('../helpers/jwtHelper');
+const client = require('../helpers/initRedis');
 
 exports.register = async (req, res, next) => {
 	try {
@@ -60,6 +61,20 @@ exports.refreshToken = async (req, res, next) => {
 	}
 };
 
-exports.logout = (req, res, next) => {
-	res.send('logout router');
+exports.logout = async (req, res, next) => {
+	try {
+		const id = req.user._id.toString();
+
+		client.del(id, (err, val) => {
+			if (err) {
+				console.log(err);
+				return next(createError.InternalServerError());
+			}
+			if (!val) return next(createError.Unauthorized());
+
+			return res.sendStatus(204);
+		});
+	} catch (err) {
+		next(err);
+	}
 };

@@ -11,6 +11,6 @@ router.post('/register', validateBody(signUpSchema), authController.register);
 
 router.post('/refresh-token', validateRefreshToken, authController.refreshToken);
 
-router.delete('/logout', authController.logout);
+router.delete('/logout', checkAuth, authController.logout);
 
 module.exports = router;
