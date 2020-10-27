@@ -1,6 +1,6 @@
 const express = require('express');
 const authController = require('../controllers/authController');
-const { validateBody } = require('../midddlewares/middleware');
+const { validateBody, checkAuth, validateRefreshToken } = require('../midddlewares/middleware');
 const { loginSchema, signUpSchema } = require('../helpers/validationSchema');
 
 const router = express.Router();
@@ -9,7 +9,7 @@ router.post('/login', validateBody(loginSchema), authController.login);
 
 router.post('/register', validateBody(signUpSchema), authController.register);
 
-router.post('/refresh-token', authController.refreshToken);
+router.post('/refresh-token', validateRefreshToken, authController.refreshToken);
 
 router.delete('/logout', authController.logout);
 

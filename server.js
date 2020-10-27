@@ -4,6 +4,7 @@ const app = require('./app');
 require('dotenv').config();
 
 const initMongo = require('./helpers/initMongo');
+const redisClient = require('./helpers/initRedis');
 
 const PORT = process.env.PORT || 8000;
 
@@ -13,6 +14,7 @@ initMongo(MONGO_URI, process.env.DB_NAME);
 
 process.on('SIGINT', async () => {
 	await mongoose.connection.close();
+	redisClient.quit();
 	process.exit(1);
 });
 

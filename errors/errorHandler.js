@@ -2,6 +2,7 @@ const { HttpError } = require('http-errors');
 const createError = require('http-errors');
 
 exports.errorHandler = (err, req, res, next) => {
+	// console.log(err);
 	if (err.name === 'JsonWebTokenError') {
 		err = createError.Unauthorized();
 	} else if (err.name === 'TokenExpiredError') {

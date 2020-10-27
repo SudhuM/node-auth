@@ -1,5 +1,6 @@
 const createError = require('http-errors');
 const { verifyToken } = require('../helpers/jwtHelper');
+const client = require('../helpers/initRedis');
 const User = require('../models/user');
 
 exports.checkAuth = async (req, res, next) => {
@@ -15,21 +16,45 @@ exports.checkAuth = async (req, res, next) => {
 		const token = authorization.split(' ')[1];
 
 		if (!token) {
-			throw createError.Unauthorized();
+			throw createError.BadRequest('token is missing');
 		}
-
-		// TODO : invalidate token if user changes password after the token was issued
-
-		const { payload } = await verifyToken(token);
+		// verify the access token
+		const { id } = await verifyToken(token, process.env.JWT_ACCESS_SECRET_KEY);
 
 		// get the user from the DB here
-		const user = await User.findById(payload.id);
+		const user = await User.findById(id);
 
 		req.user = user;
 
 		next();
 	} catch (error) {
 		next(error);
+	}
+};
+
+exports.validateRefreshToken = async (req, res, next) => {
+	try {
+		const token = req.body.refreshToken;
+
+		if (!token) {
+			throw createError.BadRequest();
+		}
+		const { id } = await verifyToken(token, process.env.JWT_REFRESH_SECRET_KEY);
+
+		client.get(id, (err, redisRefreshToken) => {
+			if (err) {
+				console.log(err);
+				throw createError.InternalServerError();
+			}
+
+			if (redisRefreshToken !== token) {
+				return next(createError.Unauthorized());
+			}
+			req.id = id;
+			next();
+		});
+	} catch (err) {
+		next(err);
 	}
 };
 
@@ -40,9 +65,6 @@ exports.validateBody = (schema) => {
 			req.body = validatedResult;
 			next();
 		} catch (err) {
-			// if (err.isJoi) {
-			// 	err.status = 422;
-			// }
 			next(err);
 		}
 	};
