@@ -14,13 +14,10 @@ exports.register = async (req, res, next) => {
 		const accessToken = await signToken({ id: user._id });
 
 		return res.status(200).json({
-			data        : user,
+			data        : user.modifyUserObject(),
 			accessToken
 		});
 	} catch (err) {
-		if (err.isJoi) {
-			err.status = 422;
-		}
 		next(err);
 	}
 };
@@ -41,9 +38,6 @@ exports.login = async (req, res, next) => {
 			accessToken
 		});
 	} catch (error) {
-		if (error.isJoi) {
-			error.status = 400;
-		}
 		next(error);
 	}
 };

@@ -64,6 +64,11 @@ userSchema.methods.validatePassword = function(enteredPassword) {
 	return bcrypt.compare(enteredPassword, password);
 };
 
+userSchema.methods.modifyUserObject = function() {
+	this.password = this.createdAt = this.updatedAt = undefined;
+	return this;
+};
+
 const User = mongoose.model('user', userSchema);
 
 module.exports = User;
